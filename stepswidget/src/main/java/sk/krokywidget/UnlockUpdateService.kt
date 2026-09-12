@@ -11,7 +11,8 @@ class UnlockUpdateService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val unlockReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action != Intent.ACTION_USER_PRESENT) return
+            if (intent.action != Intent.ACTION_USER_PRESENT &&
+                intent.action != Intent.ACTION_SCREEN_ON) return
             refresh()
             scope.launch {
                 delay(10_000)
@@ -26,7 +27,10 @@ class UnlockUpdateService : Service() {
         startForeground(NOTIFICATION_ID, buildNotification())
         registerReceiver(
             unlockReceiver,
-            IntentFilter(Intent.ACTION_USER_PRESENT),
+            IntentFilter().apply {
+                addAction(Intent.ACTION_USER_PRESENT)
+                addAction(Intent.ACTION_SCREEN_ON)
+            },
             Context.RECEIVER_NOT_EXPORTED
         )
         refresh()
