@@ -13,7 +13,10 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 class PermissionActivity : ComponentActivity() {
-    private val permissions = setOf(HealthPermission.getReadPermission(StepsRecord::class))
+    private val permissions = setOf(
+        HealthPermission.getReadPermission(StepsRecord::class),
+        HealthPermission.PERMISSION_READ_HEALTH_DATA_IN_BACKGROUND
+    )
     private lateinit var statusText: TextView
     private lateinit var colorSpinner: Spinner
     private lateinit var opacitySeek: SeekBar
@@ -78,6 +81,7 @@ class PermissionActivity : ComponentActivity() {
             }
         })
         setContentView(layout)
+        StepsWidgetProvider.schedule(this)
         checkAndRefresh()
     }
 
