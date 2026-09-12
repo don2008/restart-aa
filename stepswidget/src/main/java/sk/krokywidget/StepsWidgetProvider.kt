@@ -28,6 +28,7 @@ class StepsWidgetProvider : AppWidgetProvider() {
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
         schedule(context)
+        UnlockUpdateService.start(context)
     }
 
     companion object {
@@ -75,7 +76,9 @@ class StepsWidgetProvider : AppWidgetProvider() {
                     val total = result.records.sumOf { it.count }
                     views.setTextViewText(R.id.steps_count,
                         NumberFormat.getIntegerInstance(Locale.getDefault()).format(total))
-                    views.setTextViewText(R.id.steps_label, "krokov dnes  •  automatická aktualizácia")
+                    val updated = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
+                        .format(LocalTime.now())
+                    views.setTextViewText(R.id.steps_label, "krokov dnes  •  aktualizované $updated")
                 }
             } catch (error: Exception) {
                 views.setTextViewText(R.id.steps_count, "—")
