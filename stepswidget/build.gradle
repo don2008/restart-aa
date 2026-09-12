@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'sk.krokywidget'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId 'sk.krokywidget'
