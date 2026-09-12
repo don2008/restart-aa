@@ -82,6 +82,7 @@ class PermissionActivity : ComponentActivity() {
         })
         setContentView(layout)
         StepsWidgetProvider.schedule(this)
+        UnlockUpdateService.start(this)
         checkAndRefresh()
     }
 
