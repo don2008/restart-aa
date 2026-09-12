@@ -31,12 +31,19 @@ jobs:
       - name: Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
+      - name: Build APKs
+        run: gradle :app:assembleDebug :stepswidget:assembleDebug --stacktrace
 
-      - name: Upload APK
+      - name: Upload Restart AA
         uses: actions/upload-artifact@v4
         with:
           name: Restart-AA
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+
+      - name: Upload Kroky Widget
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kroky-Widget
+          path: stepswidget/build/outputs/apk/debug/stepswidget-debug.apk
           if-no-files-found: error
