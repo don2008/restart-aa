@@ -1,8 +1,14 @@
 package sk.krokywidget
 
+import android.Manifest
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.health.connect.client.HealthConnectClient
@@ -46,6 +52,10 @@ class PermissionActivity : ComponentActivity() {
         layout.addView(Button(this).apply {
             text = "POVOLIŤ PRÍSTUP KU KROKOM"; setOnClickListener { askForPermission() }
         })
+        layout.addView(Button(this).apply {
+            text = "POVOLIŤ AUTOMATICKÚ AKTUALIZÁCIU"
+            setOnClickListener { requestReliableBackgroundRun() }
+        })
         layout.addView(TextView(this).apply {
             text = "Farba pozadia"; textSize = 18f; setPadding(0, 30, 0, 8)
         })
@@ -81,9 +91,38 @@ class PermissionActivity : ComponentActivity() {
             }
         })
         setContentView(layout)
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            androidx.core.app.ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 101)
+        }
         StepsWidgetProvider.schedule(this)
         UnlockUpdateService.start(this)
         checkAndRefresh()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        UnlockUpdateService.start(this)
+    }
+
+    private fun requestReliableBackgroundRun() {
+        val power = getSystemService(PowerManager::class.java)
+        if (power.isIgnoringBatteryOptimizations(packageName)) {
+            Toast.makeText(this, "Automatická aktualizácia je povolená.", Toast.LENGTH_SHORT).show()
+            UnlockUpdateService.start(this)
+            return
+        }
+        try {
+            startActivity(Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                data = Uri.parse("package:$packageName")
+            })
+        } catch (_: Exception) {
+            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:$packageName")
+            })
+        }
     }
 
     private fun askForPermission() {
