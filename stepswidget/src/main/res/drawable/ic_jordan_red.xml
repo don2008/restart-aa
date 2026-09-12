@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="38dp"
+    android:viewportWidth="96"
+    android:viewportHeight="76">
+    <!-- Červená vysoká basketbalová teniska v klasickom retro štýle -->
+    <path
+        android:fillColor="#D71920"
+        android:pathData="M20,8 L47,8 L51,31 C57,37 65,42 76,46 C86,49 91,55 90,63 L87,67 L13,67 C7,67 4,63 6,58 L12,47 L17,38 Z" />
+    <path
+        android:fillColor="#A90F16"
+        android:pathData="M20,8 L32,8 L31,39 L16,51 L12,47 L17,38 Z" />
+    <path
+        android:fillColor="#F43A40"
+        android:pathData="M33,12 L46,12 L49,32 L39,39 L30,35 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,53 C30,55 41,48 52,43 C61,48 72,52 84,54 C88,55 90,58 90,62 L88,65 L10,65 C7,64 7,61 9,58 Z" />
+    <path
+        android:fillColor="#D9D9D9"
+        android:pathData="M10,65 L88,65 L85,70 L13,70 C9,70 7,68 10,65 Z" />
+    <path
+        android:fillColor="#121212"
+        android:pathData="M24,22 L45,22 L46,27 L23,27 Z M22,31 L47,31 L48,36 L21,36 Z M19,40 L41,40 L36,45 L18,45 Z" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.8"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M27,19 L43,40 M42,18 L23,41" />
+    <path
+        android:fillColor="#111111"
+        android:pathData="M51,35 C58,38 64,42 70,44 L64,50 C58,47 53,44 48,41 Z" />
+    <path
+        android:strokeColor="#7E0B10"
+        android:strokeWidth="2"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M17,38 C25,43 34,46 44,45 M52,43 C61,49 72,52 84,54" />
+</vector>
