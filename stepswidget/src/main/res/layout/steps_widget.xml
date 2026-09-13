@@ -8,7 +8,8 @@
         android:contentDescription="@null" />
     <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent"
         android:orientation="horizontal" android:gravity="center_vertical"
-        android:paddingStart="18dp" android:paddingEnd="18dp">
+        android:paddingStart="18dp" android:paddingEnd="18dp"
+        android:paddingBottom="8dp">
         <ImageView android:layout_width="52dp" android:layout_height="44dp"
             android:src="@drawable/ic_jordan_red_real" android:scaleType="fitCenter"
             android:contentDescription="Červená basketbalová teniska" />
@@ -21,4 +22,17 @@
             android:layout_marginStart="10dp" android:text="krokov dnes"
             android:textColor="#F0FFFFFF" android:textSize="14sp" />
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/goal_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="9dp"
+        android:max="100"
+        android:progress="0"
+        android:progressBackgroundTint="#40FFFFFF"
+        android:indeterminate="false" />
 </FrameLayout>
