@@ -67,6 +67,8 @@ class StepsWidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.steps_widget)
             applyStyle(context, views)
             views.setProgressBar(R.id.goal_progress, 100, 0, false)
+            views.setTextViewText(R.id.goal_status, "")
+            views.setTextViewText(R.id.update_time, "")
             val pending = PendingIntent.getActivity(context, 0,
                 Intent(context, PermissionActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -94,9 +96,9 @@ class StepsWidgetProvider : AppWidgetProvider() {
                     val goalText = NumberFormat.getIntegerInstance(Locale.getDefault()).format(goal)
                     val updated = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
                         .format(LocalTime.now())
-                    views.setTextViewText(
-                        R.id.steps_label,
-                        "z $goalText  •  $percent %  •  posledná aktualizácia $updated")
+                    views.setTextViewText(R.id.steps_label, "krokov dnes")
+                    views.setTextViewText(R.id.goal_status, "cieľ $goalText  •  $percent %")
+                    views.setTextViewText(R.id.update_time, updated)
                     views.setProgressBar(R.id.goal_progress, 100, percent, false)
                 }
             } catch (error: Exception) {
