@@ -34,7 +34,7 @@ class PermissionActivity : ComponentActivity() {
     private val colorNames = arrayOf(
         "Smaragdová", "Modrá", "Fialová", "Oranžová", "Červená", "Čierna")
     private val shoeColorNames = arrayOf(
-        "Červená", "Modrá", "Zelená", "Oranžová", "Fialová", "Strieborná")
+        "Červená", "Belasá", "Zelená", "Oranžová", "Žltá", "Fialová", "Strieborná")
     private val progressColorNames = arrayOf(
         "Červená", "Zelená", "Modrá", "Oranžová", "Žltá", "Fialová", "Biela")
 
