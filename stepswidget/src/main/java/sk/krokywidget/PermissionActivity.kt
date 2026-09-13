@@ -30,8 +30,11 @@ class PermissionActivity : ComponentActivity() {
     private lateinit var opacityText: TextView
     private lateinit var goalEdit: EditText
     private lateinit var progressColorSpinner: Spinner
+    private lateinit var shoeColorSpinner: Spinner
     private val colorNames = arrayOf(
         "Smaragdová", "Modrá", "Fialová", "Oranžová", "Červená", "Čierna")
+    private val shoeColorNames = arrayOf(
+        "Červená", "Modrá", "Zelená", "Oranžová", "Fialová", "Strieborná")
     private val progressColorNames = arrayOf(
         "Červená", "Zelená", "Modrá", "Oranžová", "Žltá", "Fialová", "Biela")
 
@@ -74,6 +77,18 @@ class PermissionActivity : ComponentActivity() {
             hint = "napríklad 10000"
         }
         layout.addView(goalEdit)
+
+        layout.addView(TextView(this).apply {
+            text = "Farba tenisky"; textSize = 18f; setPadding(0, 24, 0, 8)
+        })
+        shoeColorSpinner = Spinner(this).apply {
+            adapter = ArrayAdapter(
+                this@PermissionActivity,
+                android.R.layout.simple_spinner_dropdown_item,
+                shoeColorNames)
+            setSelection(prefs.getInt(StepsWidgetProvider.KEY_SHOE_COLOR, 0))
+        }
+        layout.addView(shoeColorSpinner)
 
         layout.addView(TextView(this).apply {
             text = "Farba ukazovateľa cieľa"; textSize = 18f; setPadding(0, 24, 0, 8)
@@ -131,6 +146,9 @@ class PermissionActivity : ComponentActivity() {
                     .putInt(
                         StepsWidgetProvider.KEY_PROGRESS_COLOR,
                         progressColorSpinner.selectedItemPosition)
+                    .putInt(
+                        StepsWidgetProvider.KEY_SHOE_COLOR,
+                        shoeColorSpinner.selectedItemPosition)
                     .putInt(StepsWidgetProvider.KEY_COLOR, colorSpinner.selectedItemPosition)
                     .putInt(StepsWidgetProvider.KEY_OPACITY, opacitySeek.progress + 20)
                     .apply()
