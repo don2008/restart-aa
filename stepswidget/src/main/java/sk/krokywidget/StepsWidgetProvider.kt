@@ -45,7 +45,8 @@ class StepsWidgetProvider : AppWidgetProvider() {
             Color.rgb(230,108,25), Color.rgb(190,45,55), Color.rgb(25,25,28))
         private val SHOE_IMAGES = intArrayOf(
             R.drawable.shoe_red, R.drawable.shoe_blue, R.drawable.shoe_green,
-            R.drawable.shoe_orange, R.drawable.shoe_purple, R.drawable.shoe_silver)
+            R.drawable.shoe_orange, R.drawable.shoe_yellow,
+            R.drawable.shoe_purple, R.drawable.shoe_silver)
         private val PROGRESS_COLORS = intArrayOf(
             Color.rgb(244,67,54), Color.rgb(76,175,80), Color.rgb(33,150,243),
             Color.rgb(255,152,0), Color.rgb(255,214,0), Color.rgb(156,39,176),
