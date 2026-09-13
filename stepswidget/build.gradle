@@ -3,7 +3,7 @@ android {
     namespace 'sk.krokywidget'; compileSdk 36
     defaultConfig {
         applicationId 'sk.krokywidget'; minSdk 34; targetSdk 35
-        versionCode 11; versionName '2.0'
+        versionCode 12; versionName '2.1'
     }
     kotlinOptions { jvmTarget = '17' }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
