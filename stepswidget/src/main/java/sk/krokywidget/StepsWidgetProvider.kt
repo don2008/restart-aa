@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.*
 import android.widget.RemoteViews
 import androidx.health.connect.client.HealthConnectClient
@@ -35,10 +36,16 @@ class StepsWidgetProvider : AppWidgetProvider() {
         const val PREFS = "widget_style"
         const val KEY_COLOR = "color"
         const val KEY_OPACITY = "opacity"
+        const val KEY_GOAL = "daily_goal"
+        const val KEY_PROGRESS_COLOR = "progress_color"
         private const val WORK_NAME = "steps-widget-refresh"
         private val COLORS = intArrayOf(
             Color.rgb(7,94,84), Color.rgb(20,88,180), Color.rgb(103,58,183),
             Color.rgb(230,108,25), Color.rgb(190,45,55), Color.rgb(25,25,28))
+        private val PROGRESS_COLORS = intArrayOf(
+            Color.rgb(244,67,54), Color.rgb(76,175,80), Color.rgb(33,150,243),
+            Color.rgb(255,152,0), Color.rgb(255,214,0), Color.rgb(156,39,176),
+            Color.WHITE)
 
         fun schedule(context: Context) {
             val work = PeriodicWorkRequestBuilder<WidgetRefreshWorker>(15, TimeUnit.MINUTES).build()
@@ -55,6 +62,7 @@ class StepsWidgetProvider : AppWidgetProvider() {
             if (ids.isEmpty()) return
             val views = RemoteViews(context.packageName, R.layout.steps_widget)
             applyStyle(context, views)
+            views.setProgressBar(R.id.goal_progress, 100, 0, false)
             val pending = PendingIntent.getActivity(context, 0,
                 Intent(context, PermissionActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -74,11 +82,16 @@ class StepsWidgetProvider : AppWidgetProvider() {
                         timeRangeFilter = TimeRangeFilter.between(
                             LocalDate.now(zone).atStartOfDay(zone).toInstant(), Instant.now())))
                     val total = result.records.sumOf { it.count }
+                    val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    val goal = prefs.getInt(KEY_GOAL, 10000).coerceAtLeast(1)
+                    val percent = ((total * 100L) / goal).coerceIn(0L, 100L).toInt()
                     views.setTextViewText(R.id.steps_count,
                         NumberFormat.getIntegerInstance(Locale.getDefault()).format(total))
+                    val goalText = NumberFormat.getIntegerInstance(Locale.getDefault()).format(goal)
                     val updated = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
                         .format(LocalTime.now())
-                    views.setTextViewText(R.id.steps_label, "krokov dnes  •  aktualizované $updated")
+                    views.setTextViewText(R.id.steps_label, "z $goalText  •  $percent %  •  $updated")
+                    views.setProgressBar(R.id.goal_progress, 100, percent, false)
                 }
             } catch (error: Exception) {
                 views.setTextViewText(R.id.steps_count, "—")
@@ -91,6 +104,10 @@ class StepsWidgetProvider : AppWidgetProvider() {
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val base = COLORS[prefs.getInt(KEY_COLOR,0).coerceIn(COLORS.indices)]
             val opacity = prefs.getInt(KEY_OPACITY,92).coerceIn(20,100)
+            val progressColor = PROGRESS_COLORS[
+                prefs.getInt(KEY_PROGRESS_COLOR, 0).coerceIn(PROGRESS_COLORS.indices)]
+            views.setColorStateList(
+                R.id.goal_progress, "setProgressTintList", ColorStateList.valueOf(progressColor))
             val color = Color.argb(opacity*255/100, Color.red(base), Color.green(base), Color.blue(base))
             val bitmap = Bitmap.createBitmap(1000,180,Bitmap.Config.ARGB_8888)
             Canvas(bitmap).drawRoundRect(2f,2f,998f,178f,44f,44f,
