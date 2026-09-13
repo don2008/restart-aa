@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.text.InputType
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.health.connect.client.HealthConnectClient
@@ -27,7 +28,12 @@ class PermissionActivity : ComponentActivity() {
     private lateinit var colorSpinner: Spinner
     private lateinit var opacitySeek: SeekBar
     private lateinit var opacityText: TextView
-    private val colorNames = arrayOf("Smaragdová", "Modrá", "Fialová", "Oranžová", "Červená", "Čierna")
+    private lateinit var goalEdit: EditText
+    private lateinit var progressColorSpinner: Spinner
+    private val colorNames = arrayOf(
+        "Smaragdová", "Modrá", "Fialová", "Oranžová", "Červená", "Čierna")
+    private val progressColorNames = arrayOf(
+        "Červená", "Zelená", "Modrá", "Oranžová", "Žltá", "Fialová", "Biela")
 
     private val requestPermissions =
         registerForActivityResult(PermissionController.createRequestPermissionResultContract()) { granted ->
@@ -44,6 +50,8 @@ class PermissionActivity : ComponentActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(48, 56, 48, 48)
         }
+        val scroll = ScrollView(this).apply { addView(layout) }
+
         layout.addView(TextView(this).apply { text = "Kroky Widget"; textSize = 28f })
         statusText = TextView(this).apply {
             text = "Kontrolujem Health Connect…"; textSize = 16f; setPadding(0, 24, 0, 20)
@@ -56,14 +64,41 @@ class PermissionActivity : ComponentActivity() {
             text = "POVOLIŤ AUTOMATICKÚ AKTUALIZÁCIU"
             setOnClickListener { requestReliableBackgroundRun() }
         })
+
         layout.addView(TextView(this).apply {
-            text = "Farba pozadia"; textSize = 18f; setPadding(0, 30, 0, 8)
+            text = "Denný cieľ počtu krokov"; textSize = 18f; setPadding(0, 30, 0, 8)
+        })
+        goalEdit = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            setText(prefs.getInt(StepsWidgetProvider.KEY_GOAL, 10000).toString())
+            hint = "napríklad 10000"
+        }
+        layout.addView(goalEdit)
+
+        layout.addView(TextView(this).apply {
+            text = "Farba ukazovateľa cieľa"; textSize = 18f; setPadding(0, 24, 0, 8)
+        })
+        progressColorSpinner = Spinner(this).apply {
+            adapter = ArrayAdapter(
+                this@PermissionActivity,
+                android.R.layout.simple_spinner_dropdown_item,
+                progressColorNames)
+            setSelection(prefs.getInt(StepsWidgetProvider.KEY_PROGRESS_COLOR, 0))
+        }
+        layout.addView(progressColorSpinner)
+
+        layout.addView(TextView(this).apply {
+            text = "Farba pozadia"; textSize = 18f; setPadding(0, 24, 0, 8)
         })
         colorSpinner = Spinner(this).apply {
-            adapter = ArrayAdapter(this@PermissionActivity, android.R.layout.simple_spinner_dropdown_item, colorNames)
+            adapter = ArrayAdapter(
+                this@PermissionActivity,
+                android.R.layout.simple_spinner_dropdown_item,
+                colorNames)
             setSelection(prefs.getInt(StepsWidgetProvider.KEY_COLOR, 0))
         }
         layout.addView(colorSpinner)
+
         opacityText = TextView(this).apply { textSize = 18f; setPadding(0, 24, 0, 4) }
         layout.addView(opacityText)
         opacitySeek = SeekBar(this).apply {
@@ -79,18 +114,35 @@ class PermissionActivity : ComponentActivity() {
         }
         opacityText.text = "Priehľadnosť pozadia: " + (opacitySeek.progress + 20) + " %"
         layout.addView(opacitySeek)
+
         layout.addView(Button(this).apply {
-            text = "ULOŽIŤ VZHĽAD A OBNOVIŤ"
+            text = "ULOŽIŤ NASTAVENIA A OBNOVIŤ"
             setOnClickListener {
+                val goal = goalEdit.text.toString().toIntOrNull()
+                if (goal == null || goal !in 100..100000) {
+                    Toast.makeText(
+                        this@PermissionActivity,
+                        "Zadajte cieľ od 100 do 100 000 krokov.",
+                        Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
                 prefs.edit()
+                    .putInt(StepsWidgetProvider.KEY_GOAL, goal)
+                    .putInt(
+                        StepsWidgetProvider.KEY_PROGRESS_COLOR,
+                        progressColorSpinner.selectedItemPosition)
                     .putInt(StepsWidgetProvider.KEY_COLOR, colorSpinner.selectedItemPosition)
                     .putInt(StepsWidgetProvider.KEY_OPACITY, opacitySeek.progress + 20)
                     .apply()
-                Toast.makeText(this@PermissionActivity, "Vzhľad bol uložený.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this@PermissionActivity,
+                    "Nastavenia boli uložené.",
+                    Toast.LENGTH_SHORT).show()
                 refreshWidgets()
             }
         })
-        setContentView(layout)
+
+        setContentView(scroll)
         if (Build.VERSION.SDK_INT >= 33 &&
             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
             android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -110,7 +162,8 @@ class PermissionActivity : ComponentActivity() {
     private fun requestReliableBackgroundRun() {
         val power = getSystemService(PowerManager::class.java)
         if (power.isIgnoringBatteryOptimizations(packageName)) {
-            Toast.makeText(this, "Automatická aktualizácia je povolená.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this, "Automatická aktualizácia je povolená.", Toast.LENGTH_SHORT).show()
             UnlockUpdateService.start(this)
             return
         }
@@ -136,7 +189,8 @@ class PermissionActivity : ComponentActivity() {
 
     private fun checkAndRefresh() {
         if (HealthConnectClient.getSdkStatus(this) != HealthConnectClient.SDK_AVAILABLE) {
-            statusText.text = "Health Connect nie je dostupný. Skontrolujte ho v Nastaveniach telefónu."
+            statusText.text =
+                "Health Connect nie je dostupný. Skontrolujte ho v Nastaveniach telefónu."
             return
         }
         lifecycleScope.launch {
@@ -147,7 +201,9 @@ class PermissionActivity : ComponentActivity() {
                     refreshWidgets()
                 } else statusText.text = "Prístup ku krokom zatiaľ nie je povolený."
             } catch (error: Exception) {
-                statusText.text = "Health Connect hlási chybu: " + (error.message ?: error.javaClass.simpleName)
+                statusText.text =
+                    "Health Connect hlási chybu: " +
+                    (error.message ?: error.javaClass.simpleName)
             }
         }
     }
