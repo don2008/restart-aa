@@ -38,10 +38,14 @@ class StepsWidgetProvider : AppWidgetProvider() {
         const val KEY_OPACITY = "opacity"
         const val KEY_GOAL = "daily_goal"
         const val KEY_PROGRESS_COLOR = "progress_color"
+        const val KEY_SHOE_COLOR = "shoe_color"
         private const val WORK_NAME = "steps-widget-refresh"
         private val COLORS = intArrayOf(
             Color.rgb(7,94,84), Color.rgb(20,88,180), Color.rgb(103,58,183),
             Color.rgb(230,108,25), Color.rgb(190,45,55), Color.rgb(25,25,28))
+        private val SHOE_IMAGES = intArrayOf(
+            R.drawable.shoe_red, R.drawable.shoe_blue, R.drawable.shoe_green,
+            R.drawable.shoe_orange, R.drawable.shoe_purple, R.drawable.shoe_silver)
         private val PROGRESS_COLORS = intArrayOf(
             Color.rgb(244,67,54), Color.rgb(76,175,80), Color.rgb(33,150,243),
             Color.rgb(255,152,0), Color.rgb(255,214,0), Color.rgb(156,39,176),
@@ -90,7 +94,9 @@ class StepsWidgetProvider : AppWidgetProvider() {
                     val goalText = NumberFormat.getIntegerInstance(Locale.getDefault()).format(goal)
                     val updated = java.time.format.DateTimeFormatter.ofPattern("HH:mm")
                         .format(LocalTime.now())
-                    views.setTextViewText(R.id.steps_label, "z $goalText  •  $percent %  •  $updated")
+                    views.setTextViewText(
+                        R.id.steps_label,
+                        "z $goalText  •  $percent %  •  posledná aktualizácia $updated")
                     views.setProgressBar(R.id.goal_progress, 100, percent, false)
                 }
             } catch (error: Exception) {
@@ -104,6 +110,9 @@ class StepsWidgetProvider : AppWidgetProvider() {
             val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
             val base = COLORS[prefs.getInt(KEY_COLOR,0).coerceIn(COLORS.indices)]
             val opacity = prefs.getInt(KEY_OPACITY,92).coerceIn(20,100)
+            val shoeImage = SHOE_IMAGES[
+                prefs.getInt(KEY_SHOE_COLOR, 0).coerceIn(SHOE_IMAGES.indices)]
+            views.setImageViewResource(R.id.shoe_icon, shoeImage)
             val progressColor = PROGRESS_COLORS[
                 prefs.getInt(KEY_PROGRESS_COLOR, 0).coerceIn(PROGRESS_COLORS.indices)]
             views.setColorStateList(
